@@ -2,8 +2,8 @@
 	"name": "ht1-bd2e-front",
 	"version": "0.0.1",
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
+		"dev": "vite dev --port 5050",
+		"build": "vite build --port 5050",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch"
