@@ -14,6 +14,7 @@ values.icons = {
 };
 values.lib = {
     bde: values.baseURL + '8j9047.jpg',
+    banner: values.baseURL + 'yiorv1.png'
 };
 
 export default values;

@@ -1,4 +1,6 @@
 import { baseURL } from "./constants.json";
+import {navigate} from 'svelte-routing'
+
 import image from './lib/imageExports.js';
 /**
  * @typedef {{ [key: string]: any }} SolutionObject
@@ -70,9 +72,11 @@ export const login = async (window, email, passwd) => {
     if (received.status === "success") {
         manageData(window, received, "set");
 
-        window.location.href = "/";
-        window.location.reload();
+        navigate('/');
+window.location.reload();
     }
+    navigate('/');
+window.location.reload();
     return received;
 }
 
@@ -82,7 +86,7 @@ export const login = async (window, email, passwd) => {
  */
 export const logout = window => {
     window.localStorage.clear();
-    window.location.href = "/";
+    navigate('/');
     window.location.reload();
 }
 
@@ -92,6 +96,36 @@ export const logout = window => {
 export const getGuests = async () => {
     return await POST(
         `${baseURL}guest/`,
+        {
+            'Content-Type': 'application/json'
+        },
+        {
+            "methodType": "all"
+        }
+    );
+}
+
+/**
+ * @returns {Promise<SolutionObject[]>}
+ */
+export const getPartners = async () => {
+    return await POST(
+        `${baseURL}partner/`,
+        {
+            'Content-Type': 'application/json'
+        },
+        {
+            "methodType": "all"
+        }
+    );
+}
+
+/**
+ * @returns {Promise<SolutionObject[]>}
+ */
+export const getEvents = async () => {
+    return await POST(
+        `${baseURL}event/`,
         {
             'Content-Type': 'application/json'
         },
@@ -120,12 +154,15 @@ export const renderName = (lastName, firstName) => {
 
 /**
  * @param {string} rawRole
+ * @param {boolean} simplify
  * @returns {string[]}
  */
-export const getRole = rawRole => {
-    return rawRole.split("::").map(role => {
+export const getRole = (rawRole, simplify) => {
+    let roles = rawRole.split("::");
+
+    roles = roles.map(role => {
         return {
-            p: 'Président(e)',
+            pre: 'Président(e)',
             vp: 'Vice-Président(e)',
             revent: 'Responsable Événementiel',
             rpart: 'Responsable Partenariat',
@@ -139,4 +176,68 @@ export const getRole = rawRole => {
             und: 'Membre Indéfini'
         }[role]
     });
+
+    if (simplify) {
+        roles = roles.filter(role => {
+            return role.includes('Président') || role.includes('Secrétariat') || role.includes('Responsable');
+        });
+    }
+
+    return roles;
+}
+
+/**
+ * @param {SolutionObject[]} list
+ * @returns {{ category: string, members: SolutionObject[] }[]} list
+ */
+export const sortRoles = list => {
+    const categories = {
+        "p::vp::sec": [],
+        "acc": [],
+        "com": [],
+        "part": [],
+        "event": []
+    };
+    for (const bdeMember of list) {
+        if (bdeMember.role.includes('pre') || bdeMember.role.includes('vp') || bdeMember.role.includes('sec')) {
+            categories['p::vp::sec'].push(bdeMember);
+        }
+        if (bdeMember.role.includes('event')) categories['event'].push(bdeMember);
+        if (bdeMember.role.includes('com')) categories['com'].push(bdeMember);
+        if (bdeMember.role.includes('part')) categories['part'].push(bdeMember);
+        if (bdeMember.role.includes('acc')) categories['acc'].push(bdeMember);
+    }
+    const categoriesToSort = Object.entries(categories).map(cat => {
+        return {
+            category: {
+                "p::vp::sec": "Présidence",
+                "event": 'Événementiel',
+                "part": 'Partenariat',
+                "com": 'Communication',
+                "acc": 'Trésorerie',
+            }[cat[0]],
+            members: cat[1],
+        }
+    });
+
+    // Mettre la présidente en premier, le vice président ensuite, et les responsables de chaque pôle
+    categoriesToSort[0].members.sort((a, b) => {
+        if (a.role.includes('pre')) return -1;
+        if (a.role.includes('vp')) return 1;
+        if (a.role.includes('sec')) return 1;
+        return 0;
+    });
+
+    let i = 1;
+    while (i < categoriesToSort.length) {
+        console.log(i);
+        categoriesToSort[i].members.sort((a, b) => {
+            console.log(a.role);
+            if (a.role.startsWith('r')) return -1;
+            return 1;
+        });
+        i++;
+    }
+
+    return categoriesToSort;
 }

@@ -1,5 +1,23 @@
 <script>
     import images from '../../lib/imageExports.js';
+    import {logout, renderName} from '../../utils.js';
+    /**
+     * @type {import('../../utils.js').SolutionObject | null}
+     */
+    let localData;
+
+    setInterval(() => {
+        try {
+            if (window) localData = window.localStorage;
+        }
+        catch (err) {
+            void err;
+        }
+    }, 200);
+
+    const disconnect = () => {
+        logout(window);
+    }
 </script>
 
 <section>
@@ -8,16 +26,28 @@
     </h1>
 
     <div class="barre">
-        <a href="/"> <button class="but"> <img src={images.icons.logo} alt="home" width="20" height="20"/> </button> </a>
-        <a href="/evenement"> <button class="but">Evènement</button> </a>
-        <a href="/information"> <button class="but">Information</button> </a>
-        <a href="/partenariat"> <button class="but">Nos Partenariat</button> </a>
-        <a href="/rejoindre_contacter"> <button class="but">Nous contacter / Nous rejoindre</button> </a>
-        <a href="/connexion"> <button class="but">Connexion</button> </a>
+        <a href="/"> <button class="but"> <img src={images.icons.home} alt="home" width="20" height="20"/> </button> </a>
+        <a href="/events"> <button class="but">Événements</button> </a>
+        <a href="/informations"> <button class="but">Informations</button> </a>
+        <a href="/partenaires"> <button class="but">Partenaires</button> </a>
+        <a href="/contact"> <button class="but">Nous Contacter</button> </a>
+
+        {#if localData?._first_name}
+            <h2 class="loggedinas">{renderName(localData._last_name, localData._first_name)}</h2>
+            <button class="but" on:click={disconnect}>Se déconnecter</button>
+        {:else}
+            <a href="/connexion"> <button class="but">Connexion</button> </a>
+        {/if}
     </div>
 </section>
 
 <style>
+    .loggedinas {
+        color: white;
+        font-size: 20px;
+        padding: 10px;
+        font-family: "IBM Plex Sans","sans-serif";
+    }
     * {
         margin: 0;
         padding: 0;
@@ -52,7 +82,6 @@
     }
     section {
         border-right: 1px solid white;
-        height: 100 vh;
         scroll-snap-align: start;
         text-align: center;
     }

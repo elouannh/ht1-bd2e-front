@@ -13,7 +13,7 @@
         </div>
         <div class="zbeub">
             <a href="https://www.estiam.education/">
-                <img src={images.lib.bde} alt="estiam_logo_LYON" height="50px"/>
+                <img src={images.lib.banner} alt="estiam_logo_LYON" height="50px"/>
             </a>
         </div>
         <div class="gaef">
@@ -38,9 +38,9 @@
 
     section {
         border-right: 1px solid white;
-        height: 100vh;
         scroll-snap-align: start;
         text-align: center;
+        margin-top: auto;
     }
 
     .flex-container {
