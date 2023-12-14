@@ -58,7 +58,9 @@
 
 <style>
     .paddgau{
-        padding-left: 10px;
+        padding-left: 300px;
+        padding-right: 300px;
+        padding-bottom: 50px;
     }
 
     .desc{    

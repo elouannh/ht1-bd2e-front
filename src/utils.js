@@ -130,7 +130,7 @@ export const getEvents = async () => {
             'Content-Type': 'application/json'
         },
         {
-            "methodType": "all"
+            "methodType": "chzgjkhi"
         }
     );
 }
