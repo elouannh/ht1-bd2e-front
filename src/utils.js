@@ -1,4 +1,5 @@
 import { baseURL } from "./constants.json";
+import image from './lib/imageExports.js';
 /**
  * @typedef {{ [key: string]: any }} SolutionObject
  */
@@ -15,7 +16,6 @@ export const POST = async (url, headers, body) => {
         headers,
         body: JSON.stringify(body)
     });
-    console.log(response);
     return response.json();
 }
 
@@ -84,4 +84,59 @@ export const logout = window => {
     window.localStorage.clear();
     window.location.href = "/";
     window.location.reload();
+}
+
+/**
+ * @returns {Promise<SolutionObject[]>}
+ */
+export const getGuests = async () => {
+    return await POST(
+        `${baseURL}guest/`,
+        {
+            'Content-Type': 'application/json'
+        },
+        {
+            "methodType": "all"
+        }
+    );
+}
+
+/**
+ * @param {string} imageEndpoint
+ * @returns {string}
+ */
+export const renderImage = imageEndpoint => {
+    return image.baseURL + imageEndpoint;
+}
+
+/**
+  * @param {string} lastName
+  * @param {string} firstName
+ * @returns {string}
+  */
+export const renderName = (lastName, firstName) => {
+    return `${lastName.toUpperCase()} ${firstName.split(" ").map(name => name[0].toUpperCase() + name.slice(1)).join(" ")}`;
+}
+
+/**
+ * @param {string} rawRole
+ * @returns {string[]}
+ */
+export const getRole = rawRole => {
+    return rawRole.split("::").map(role => {
+        return {
+            p: 'Président(e)',
+            vp: 'Vice-Président(e)',
+            revent: 'Responsable Événementiel',
+            rpart: 'Responsable Partenariat',
+            rcom: 'Responsable Communication',
+            racc: 'Responsable Trésorerie',
+            sec: 'Secrétariat',
+            event: 'Événementiel',
+            part: 'Partenariat',
+            com: 'Communication',
+            acc: 'Trésorerie',
+            und: 'Membre Indéfini'
+        }[role]
+    });
 }
